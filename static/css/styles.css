@@ -1,0 +1,74 @@
+body {
+    background: linear-gradient(to bottom, #000, #006400);
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.table {
+    border: 5px solid #DAA520;
+    border-radius: 20px;
+    width: 80%;
+    max-width: 1000px;
+    padding: 20px;
+    background: #228B22;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+}
+
+.player, .community {
+    text-align: center;
+    margin: 15px;
+}
+
+.player h3, .community h2 {
+    margin: 0;
+    padding: 10px;
+}
+
+.cards {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.card {
+    width: 50px;
+    height: 70px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #fff, #e5e5e5);
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.card.hidden {
+    background: #000;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #DAA520;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #000;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #ffd700;
+}
