@@ -21,6 +21,13 @@ poker_table = {
     "community_cards": []  # Community cards
 }
 
+# Add a global log for game resets
+game_logs = []
+
+@app.route('/view-logs', methods=['GET'])
+def view_logs():
+    return jsonify({"logs": game_logs})
+
 @app.route('/get-players', methods=['GET'])
 def get_players():
     try:
@@ -113,7 +120,16 @@ def reset_community_cards():
 
 @app.route('/reset-game', methods=['POST'])
 def reset_game():
-    global poker_table
+    global poker_table, game_logs
+
+    # Save the current state as a log
+    log = {
+        "players": poker_table["players"],
+        "community_cards": poker_table["community_cards"]
+    }
+    game_logs.append(log)
+
+    # Reset the poker table
     poker_table = {
         "players": [
             {
@@ -128,7 +144,11 @@ def reset_game():
         "community_cards": []
     }
 
-    return jsonify({"message": "Game has been reset", "poker_table": poker_table}), 200
+    return jsonify({
+        "message": "Game has been reset",
+        "poker_table": poker_table,
+        "logs": game_logs
+    }), 200
 
 @app.route('/reveal-dealer', methods=['POST'])
 def reveal_dealer():

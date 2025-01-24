@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poker Tracker</title>
-    <link rel="stylesheet" href="static/css/styles.css"> <!-- Link to CSS -->
+    <link rel="stylesheet" href="static/css/styles.css"> <!-- Link to external CSS -->
     <style>
-        /* Styling for community cards container */
+        /* Inline styles for additional customizations */
         #communityCardsContainer {
             display: flex;
             gap: 10px; /* Add space between cards */
@@ -14,27 +14,26 @@
             justify-content: center; /* Center the cards horizontally */
         }
 
-        /* Styling for individual cards */
-        .community-card {
-            width: 60px;
-            height: 90px;
-            border: 1px solid #000;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f0f0f0;
-            font-size: 16px;
-            font-weight: bold;
+        #logContainer {
+            margin-top: 20px;
+            border: 2px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f9f9f9;
         }
 
-        /* General page styles */
-        .table {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-            font-family: Arial, sans-serif;
+        .log-entry {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .log-title {
+            font-weight: bold;
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -45,9 +44,7 @@
         <!-- Community Cards Section -->
         <div id="community-cards" class="community">
             <h2>Community Cards</h2>
-            <div id="communityCardsContainer">
-                <!-- Community cards (including placeholders) will be dynamically added here -->
-            </div>
+            <div id="communityCardsContainer"></div>
             <input type="text" id="communityCardInput" placeholder="Enter community card">
             <button onclick="addCommunityCard()">Add Community Card</button>
             <button onclick="resetCommunityCards()">Reset Community Cards</button>
@@ -55,11 +52,20 @@
 
         <!-- Players Section -->
         <div id="players">
-            <!-- Players will be dynamically added here -->
+            <!-- Players will be dynamically rendered here -->
         </div>
         <button onclick="fetchPlayers()">Fetch Players</button>
-        <button id="resetButton">Reset Game</button> <!-- Reset Button -->
+        <button id="resetButton" onclick="resetGame()">Reset Game</button>
+
+        <!-- Logs Section -->
+        <div id="logs">
+            <h2>Game Logs</h2>
+            <button onclick="viewLogs()">View Logs</button>
+            <div id="logContainer">
+                <!-- Logs will be dynamically rendered here -->
+            </div>
+        </div>        
     </div>
-    <script src="static/js/scripts.js"></script> <!-- Link to JS -->
+    <script src="static/js/scripts.js"></script> <!-- Link to external JavaScript -->
 </body>
 </html>

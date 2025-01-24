@@ -182,7 +182,7 @@ function assignCard(playerName, card) {
         });
 }
 
-document.getElementById('resetButton').addEventListener('click', function () {
+function resetGame() {
     if (!confirm("Are you sure you want to reset the game?")) {
         return;
     }
@@ -203,9 +203,83 @@ document.getElementById('resetButton').addEventListener('click', function () {
             console.error('Error resetting the game:', error);
             alert('Failed to reset the game.');
         });
-});
+}
+
+function viewLogs() {
+    fetch(`${BASE_URL}/view-logs`)
+        .then(response => response.json())
+        .then(data => {
+            const logContainer = document.getElementById('logContainer');
+            logContainer.innerHTML = ''; // Clear existing logs
+
+            if (data.logs.length === 0) {
+                logContainer.innerHTML = '<p>No logs available.</p>';
+                return;
+            }
+
+            data.logs.forEach((log, index) => {
+                const logDiv = document.createElement('div');
+                logDiv.className = 'log-entry';
+
+                const logTitle = document.createElement('div');
+                logTitle.className = 'log-title';
+                logTitle.textContent = `Log #${index + 1}`;
+                logDiv.appendChild(logTitle);
+
+                // Players Section
+                const playersLog = document.createElement('div');
+                playersLog.className = 'player-log';
+                playersLog.innerHTML = '<h4>Players:</h4>';
+                log.players.forEach(player => {
+                    const playerDiv = document.createElement('div');
+                    playerDiv.style.marginBottom = '10px';
+                    playerDiv.innerHTML = `<strong>${player.name}:</strong>`;
+                    const cardsDiv = document.createElement('div');
+                    cardsDiv.className = 'cards';
+                    player.cards.forEach(card => {
+                        const cardDiv = document.createElement('div');
+                        cardDiv.className = `card ${card.hidden ? 'hidden' : ''}`;
+                        cardDiv.textContent = card.hidden ? '??' : card.value;
+                        cardsDiv.appendChild(cardDiv);
+                    });
+                    playerDiv.appendChild(cardsDiv);
+                    playersLog.appendChild(playerDiv);
+                });
+                logDiv.appendChild(playersLog);
+
+                // Community Cards Section
+                const communityLog = document.createElement('div');
+                communityLog.className = 'community-log';
+                communityLog.innerHTML = '<h4>Community Cards:</h4>';
+                const communityCardsDiv = document.createElement('div');
+                communityCardsDiv.className = 'cards';
+                log.community_cards.forEach(card => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card';
+                    cardDiv.textContent = card.value;
+                    communityCardsDiv.appendChild(cardDiv);
+                });
+                communityLog.appendChild(communityCardsDiv);
+                logDiv.appendChild(communityLog);
+
+                logContainer.appendChild(logDiv);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching logs:', error);
+            alert('Failed to fetch logs.');
+        });
+}
+
+// Auto-sync functionality
+function autoSync() {
+    fetchPlayers(); // Fetch players periodically
+    fetchCommunityCards(); // Fetch community cards periodically
+    setTimeout(autoSync, SYNC_INTERVAL); // Repeat after the interval
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchPlayers();
     fetchCommunityCards();
+    autoSync(); // Start auto-sync
 });
