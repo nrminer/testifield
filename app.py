@@ -24,6 +24,10 @@ poker_table = {
 # Add a global log for game resets
 game_logs = []
 
+@app.route('/static/images/<path:filename>')
+def serve_image(filename):
+    return send_from_directory('static/images', filename)
+
 @app.route('/view-logs', methods=['GET'])
 def view_logs():
     return jsonify({"logs": game_logs})
