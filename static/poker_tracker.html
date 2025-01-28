@@ -35,6 +35,25 @@
             font-weight: bold;
             margin-bottom: 5px;
         }
+
+        /* Button styling for consistency */
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #DAA520;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #000;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #ffd700;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -45,7 +64,8 @@
         <div id="community-cards" class="community">
             <h2>Community Cards</h2>
             <div id="communityCardsContainer"></div>
-            <input type="text" id="communityCardInput" placeholder="Enter community card">
+            <label for="communityCardInput">Enter Community Card:</label>
+            <input type="text" id="communityCardInput" placeholder="Enter community card" aria-label="Enter community card">
             <button onclick="addCommunityCard()">Add Community Card</button>
             <button onclick="resetCommunityCards()">Reset Community Cards</button>
         </div>

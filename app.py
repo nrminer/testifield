@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, send_from_directory
 import requests
+import re
 
 app = Flask(__name__, static_folder='static')
 
@@ -13,13 +14,19 @@ poker_table = {
             "name": "dealer",
             "cards": [
                 {"value": "??", "hidden": True},
-                {"value": "??", "hidden": True}
             ],
             "revealed": False
         }
     ],
-    "community_cards": []  # Community cards
+    "community_cards": [
+        {"value": "??", "hidden": True},
+        {"value": "??", "hidden": True},
+        {"value": "??", "hidden": True},
+        {"value": "??", "hidden": True},
+        {"value": "??", "hidden": True},
+    ]  # Initially 5 community cards with back_card.png
 }
+
 
 # Add a global log for game resets
 game_logs = []
@@ -92,7 +99,8 @@ def assign_community_card():
     global poker_table
     data = request.get_json()
 
-    if not data or "card" not in data:
+    # Validate that the card exists in the request
+    if "card" not in data:
         return jsonify({"error": "Missing card in request"}), 400
 
     card = data["card"].strip()
@@ -100,12 +108,18 @@ def assign_community_card():
     if not card:
         return jsonify({"error": "Card value cannot be empty"}), 400
 
+    # Ensure a valid card format
+    if not re.match(r'^[2-9A-K]{1}[CDHS]{1}$', card):
+        return jsonify({"error": "Invalid card format"}), 400
+
+    # Add the community card
     poker_table["community_cards"].append({"value": card, "hidden": False})
 
     return jsonify({
         "message": f"Community card {card} added",
         "community_cards": poker_table["community_cards"]
     }), 200
+
 
 @app.route('/get-community-cards', methods=['GET'])
 def get_community_cards():
@@ -140,12 +154,17 @@ def reset_game():
                 "name": "dealer",
                 "cards": [
                     {"value": "??", "hidden": True},
-                    {"value": "??", "hidden": True}
                 ],
                 "revealed": False
             }
         ],
-        "community_cards": []
+        "community_cards": [
+            {"value": "??", "hidden": True},
+            {"value": "??", "hidden": True},
+            {"value": "??", "hidden": True},
+            {"value": "??", "hidden": True},
+            {"value": "??", "hidden": True},
+        ]
     }
 
     return jsonify({

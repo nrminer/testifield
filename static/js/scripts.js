@@ -3,6 +3,7 @@ const MAX_CARDS = 5; // Maximum number of community cards
 const playersContainer = document.getElementById('players');
 const SYNC_INTERVAL = 5000; // Auto-sync interval in milliseconds (5 seconds)
 
+
 function renderPlayers(players) {
     playersContainer.innerHTML = ''; // Clear existing players
 
@@ -71,23 +72,18 @@ function renderCommunityCards(cards) {
         cardDiv.className = 'card';
 
         const cardImage = document.createElement('img');
-        cardImage.src = card.hideen = card.hidden ? '/static/images/card_back.png' : `/static/images/${formatCardName(card.value)}.png`;
-        cardImage.alt = card.value;
 
-        if (i < cards.length) {
-            // Display the actual card image
-            cardImage.src = `static/images/${formatCardName(cards[i].value)}.png`; // Adjust path as needed
+        if (i < cards.length && !cards[i].hidden) {
+            // If there is an actual card and it is not hidden, show the card's image
+            cardImage.src = `static/images/${formatCardName(cards[i].value)}.png`; 
             cardImage.alt = cards[i].value;
-            cardDiv.appendChild(cardImage);
-            cardDiv.classList.remove('hidden');
         } else {
-            // Display placeholder (card back) for hidden cards
-            cardImage.src = 'static/images/card_back.png';
+            // Otherwise, show the back of the card (card_back.png)
+            cardImage.src = 'static/images/card_back.png'; 
             cardImage.alt = 'Card Back';
-            cardDiv.appendChild(cardImage);
-            cardDiv.classList.add('hidden');
         }
 
+        cardDiv.appendChild(cardImage);
         communityCardsContainer.appendChild(cardDiv);
     }
 }
@@ -150,8 +146,6 @@ function formatCardName(cardValue) {
 
     return cardMap[cardValue] || cardValue; // Return the mapped value or the original if not found
 }
-
-
 
 function addCommunityCard() {
     const cardInput = document.getElementById('communityCardInput');
