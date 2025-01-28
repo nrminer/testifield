@@ -1,10 +1,10 @@
 const BASE_URL = 'http://127.0.0.1:5001'; // Poker Tracker backend
-const MAX_CARDS = 5; // Maximum number of community cards
 const playersContainer = document.getElementById('players');
 const SYNC_INTERVAL = 5000; // Auto-sync interval in milliseconds (5 seconds)
 
 
 function renderPlayers(players) {
+    const playersContainer = document.getElementById('players');
     playersContainer.innerHTML = ''; // Clear existing players
 
     players.forEach(player => {
@@ -17,69 +17,41 @@ function renderPlayers(players) {
         const cardsDiv = document.createElement('div');
         cardsDiv.className = 'cards';
 
-        if (player.cards && player.cards.length > 0) {
-            player.cards.forEach(card => {
-                const cardDiv = document.createElement('div');
-                cardDiv.className = `card ${card.hidden ? 'hidden' : ''}`;
+        player.cards.forEach(card => {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = `card ${card.hidden ? 'hidden' : ''}`;
 
-                // Use the formatCardName function to ensure correct image filename
-                const cardImage = document.createElement('img');
-                cardImage.src = card.hidden ? 'static/images/card_back.png' : `static/images/${formatCardName(card.value)}.png`; 
-                cardImage.alt = card.value;
-                cardDiv.appendChild(cardImage);
-
-                cardsDiv.appendChild(cardDiv);
-            });
-        } else {
-            const noCardsDiv = document.createElement('div');
-            noCardsDiv.textContent = 'No cards yet';
-            cardsDiv.appendChild(noCardsDiv);
-        }
+            const cardImage = document.createElement('img');
+            cardImage.src = card.hidden ? 'static/images/card_back.png' : `static/images/${formatCardName(card.value)}.png`;
+            cardDiv.appendChild(cardImage);
+            cardsDiv.appendChild(cardDiv);
+        });
 
         playerDiv.appendChild(playerName);
         playerDiv.appendChild(cardsDiv);
-
-        if (player.name.toLowerCase() === 'dealer') {
-            const cardInput = document.createElement('input');
-            cardInput.type = 'text';
-            cardInput.placeholder = 'Enter card';
-
-            const addCardButton = document.createElement('button');
-            addCardButton.textContent = 'Add Card';
-            addCardButton.onclick = () => assignCard(player.name, cardInput.value);
-
-            playerDiv.appendChild(cardInput);
-            playerDiv.appendChild(addCardButton);
-
-            if (!player.revealed) {
-                const revealButton = document.createElement('button');
-                revealButton.textContent = 'Reveal Dealer Cards';
-                revealButton.onclick = () => revealDealer(true);
-                playerDiv.appendChild(revealButton);
-            }
-        }
-
         playersContainer.appendChild(playerDiv);
     });
 }
+
 
 function renderCommunityCards(cards) {
     const communityCardsContainer = document.getElementById('communityCardsContainer');
     communityCardsContainer.innerHTML = ''; // Clear existing cards
 
+    // Ensure we always display 5 cards
     for (let i = 0; i < MAX_CARDS; i++) {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card';
 
         const cardImage = document.createElement('img');
-
+        
         if (i < cards.length && !cards[i].hidden) {
-            // If there is an actual card and it is not hidden, show the card's image
-            cardImage.src = `static/images/${formatCardName(cards[i].value)}.png`; 
+            // If the card is not hidden, show the actual card
+            cardImage.src = `static/images/${formatCardName(cards[i].value)}.png`;
             cardImage.alt = cards[i].value;
         } else {
-            // Otherwise, show the back of the card (card_back.png)
-            cardImage.src = 'static/images/card_back.png'; 
+            // Otherwise, show the back of the card
+            cardImage.src = 'static/images/card_back.png';
             cardImage.alt = 'Card Back';
         }
 
@@ -87,6 +59,7 @@ function renderCommunityCards(cards) {
         communityCardsContainer.appendChild(cardDiv);
     }
 }
+
 
 function formatCardName(cardValue) {
     const cardMap = {
@@ -156,49 +129,50 @@ function addCommunityCard() {
         return;
     }
 
-    fetch(`${BASE_URL}/assign-community-card`, {
+    // Send the card to the community (player named "community")
+    fetch(`${BASE_URL}/assign-card`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ card: card }),
+        body: JSON.stringify({ player_name: 'community', card: card })
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert(data.error);
-            } else {
-                alert(data.message);
-                fetchCommunityCards(); // Refresh community cards
-                cardInput.value = ''; // Clear the input field
-            }
-        })
-        .catch(error => {
-            console.error('Error adding community card:', error);
-            alert('Failed to add community card.');
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);  // Show the error message
+        } else {
+            alert(data.message);  // Show the success message
+            fetchPlayers();  // Refresh players
+            cardInput.value = '';  // Clear the input field
+        }
+    })
+    .catch(error => {
+        console.error('Error adding community card:', error);
+        alert('Failed to add community card.');
+    });
 }
 
 function resetCommunityCards() {
     if (!confirm('Are you sure you want to reset community cards?')) {
-        return;
+        return;  // Cancel reset if user does not confirm
     }
 
-    fetch(`${BASE_URL}/reset-community-cards`, {
+    fetch(`${BASE_URL}/reset-game`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         }
     })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            fetchCommunityCards();
-        })
-        .catch(error => {
-            console.error('Error resetting community cards:', error);
-            alert('Failed to reset community cards.');
-        });
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);  // Show success message
+        fetchPlayers();  // Refresh players
+    })
+    .catch(error => {
+        console.error('Error resetting community cards:', error);
+        alert('Failed to reset community cards.');
+    });
 }
 
 function fetchPlayers() {
