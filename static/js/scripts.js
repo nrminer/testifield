@@ -1,6 +1,17 @@
-const BASE_URL = 'http://127.0.0.1:5001'; // Poker Tracker backend
+const BASE_URL = 'http://192.168.10.204:5001'; // Poker Tracker backend
 const playersContainer = document.getElementById('players');
 const SYNC_INTERVAL = 5000; // Auto-sync interval in milliseconds (5 seconds)
+
+function autoSync() {
+    fetchPlayers(); // Fetch players and update the UI
+    setTimeout(autoSync, SYNC_INTERVAL); // Schedule the next sync
+}
+
+// Start auto-sync when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    fetchPlayers(); // Initial fetch of players
+    autoSync(); // Start auto-sync
+});
 
 
 function renderPlayers(players) {
@@ -71,7 +82,7 @@ function formatCardName(cardValue) {
         '7H': '7_of_hearts',
         '8H': '8_of_hearts',
         '9H': '9_of_hearts',
-        '10H': '10_of_hearts',
+        'TH': '10_of_hearts',
         'JH': 'jack_of_hearts',
         'QH': 'queen_of_hearts',
         'KH': 'king_of_hearts',
@@ -84,7 +95,7 @@ function formatCardName(cardValue) {
         '7D': '7_of_diamonds',
         '8D': '8_of_diamonds',
         '9D': '9_of_diamonds',
-        '10D': '10_of_diamonds',
+        'TD': '10_of_diamonds',
         'JD': 'jack_of_diamonds',
         'QD': 'queen_of_diamonds',
         'KD': 'king_of_diamonds',
@@ -97,7 +108,7 @@ function formatCardName(cardValue) {
         '7S': '7_of_spades',
         '8S': '8_of_spades',
         '9S': '9_of_spades',
-        '10S': '10_of_spades',
+        'TS': '10_of_spades',
         'JS': 'jack_of_spades',
         'QS': 'queen_of_spades',
         'KS': 'king_of_spades',
@@ -110,7 +121,7 @@ function formatCardName(cardValue) {
         '7C': '7_of_clubs',
         '8C': '8_of_clubs',
         '9C': '9_of_clubs',
-        '10C': '10_of_clubs',
+        'TC': '10_of_clubs',
         'JC': 'jack_of_clubs',
         'QC': 'queen_of_clubs',
         'KC': 'king_of_clubs',

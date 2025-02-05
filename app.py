@@ -39,6 +39,7 @@ game_logs = []
 def serve_image(filename):
     return send_from_directory('static/images', filename)
 
+
 @app.route('/view-logs', methods=['GET'])
 def view_logs():
     return jsonify({"logs": game_logs})
@@ -88,27 +89,39 @@ def get_players():
     return jsonify({"players": poker_table["players"]})
 
 
+@app.route('/get-active-players', methods=['GET'])
+def get_active_players():
+    try:
+        # Get all players (including community and dealer)
+        all_players = poker_table["players"]
+        
+        # Return the players in JSON format
+        return jsonify({"players": all_players})
+
+    except Exception as e:
+        return jsonify({"error": f"Error fetching active players: {str(e)}"}), 500
+
 @app.route('/assign-card', methods=['POST'])
 def assign_card():
     global poker_table
     data = request.get_json()
-
+    
     # Validate the request for the card and player
     if not data or "player_name" not in data or "card" not in data:
         return jsonify({"error": "Missing player name or card in request"}), 400
-
+    
     player_name = data["player_name"].strip().lower()  # Ensure player name is lowercase
     card = data["card"].strip()
-
+    
     # Validate card format
-    if not re.match(r'^[2-9A-K]{1}[CDHS]{1}$', card):
-        return jsonify({"error": "Invalid card format"}), 400
-
+    if not re.match(r'^[2-9TJQKA]{1}[CDHS]{1}$', card):
+        return jsonify({"error": f"Invalid card format: {card}"}), 400
+    
     # Find the player (either community, dealer, or any other player)
     player = next((p for p in poker_table["players"] if p["name"].lower() == player_name), None)
     if not player:
         return jsonify({"error": "Player not found"}), 404
-
+    
     # **Community Assignment** (Replace ?? with the new card)
     if player_name == "community":
         for i in range(len(player["cards"])):
@@ -116,7 +129,7 @@ def assign_card():
                 player["cards"][i] = {"value": card, "hidden": False}  # Replace a hidden card
                 return jsonify({"message": f"Card {card} assigned to community", "players": poker_table["players"]}), 200
         return jsonify({"error": "Community already has 5 cards"}), 400
-
+    
     # **Dealer Assignment** (Replace ?? with the new card)
     elif player_name == "dealer":
         for i in range(len(player["cards"])):
@@ -124,15 +137,23 @@ def assign_card():
                 player["cards"][i] = {"value": card, "hidden": not player["revealed"]}  # Replace a hidden card
                 return jsonify({"message": f"Card {card} assigned to dealer", "players": poker_table["players"]}), 200
         return jsonify({"error": "Dealer already has 2 cards"}), 400
-
+    
     # **Regular Players**
     else:
         player["cards"].append({"value": card, "hidden": False})
-
+    
     return jsonify({
         "message": f"Card {card} assigned to {player_name}",
         "players": poker_table["players"]
     }), 200
+
+@app.route('/players_cards', methods=['GET'])
+def get_players_cards():
+    players_cards = {
+        "Player1": ["2H", "3D"],
+        "Player2": ["5S", "AH"]
+    }
+    return jsonify({"playersCards": players_cards})
 
 # Reset Game Endpoint: Ensure dealer is properly added
 @app.route('/reset-game', methods=['POST'])
